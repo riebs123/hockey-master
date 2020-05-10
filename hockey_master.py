@@ -160,7 +160,7 @@ def stats():
 	'''
 
 	df1.to_gbq(
-		'master.players_test',
+		'hockey.players_season_summary',
 		'dulcet-outlook-227105',
 		chunksize=5000,
 		verbose=True,

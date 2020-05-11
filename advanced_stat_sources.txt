@@ -1,0 +1,13 @@
+
+
+# pull top yesterday performers
+https://www.hockey-reference.com/
+
+#advanced player stats
+https://www.hockey-reference.com/play-index/ppbp_finder.cgi?request=1&match=single&year_min=2019&season_start=1&season_end=-1&rookie=N&age_min=0&age_max=99&game_location=A&pos=S&situation_id=ev&order_by=player
+#last page
+https://www.hockey-reference.com/play-index/ppbp_finder.cgi?c2stat=&c4stat=&c2comp=&order_by_asc=&game_location=A&c1comp=&year_min=2019&request=1&franch_id=&birth_country=&match=single&year_max=&c3comp=&report=ppbp&season_end=-1&c3stat=&order_by=player&season_start=1&c1val=&c3val=&c2val=&handed=&rookie=N&pos=S&describe_only=&c1stat=&situation_id=ev&c4val=&age_min=0&age_max=99&c4comp=&offset=800
+
+advanced team stats
+https://www.hockey-reference.com/play-index/tpbp_finder.cgi?request=1&match=single&year_min=2019&situation_id=all&order_by=corsi_for
+

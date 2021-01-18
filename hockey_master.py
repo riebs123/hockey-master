@@ -10,7 +10,6 @@ bigquery_key = '/Users/User/tanner-project-588591097cf3.json'
 # GET TODAYS SCHEDULE
 #####################
 
-
 schedule_url = 'https://statsapi.web.nhl.com/api/v1/schedule?'
 schedule_response = requests.get(schedule_url)
 schedule_parse = json.loads(schedule_response.text) 
@@ -30,6 +29,7 @@ for x in schedule_parse['dates']:
 #########################
 # GET TEAMS & CONFERENCES
 #########################
+
 team_url = 'http://statsapi.web.nhl.com/api/v1/teams'
 team_response = requests.get(team_url)
 team_parse = json.loads(team_response.text)
@@ -40,7 +40,7 @@ dfteams = pd.DataFrame(todays_team_array)
 flattened = [val for sublist in todays_team_array for val in sublist]
 
 for x in team_parse['teams']:
-		#if (x['id']) in flattened: ####Filters for today's games
+		if (x['id']) in flattened: #Filters for today's games
 			team_array.append([
 				x['name'],
 				x['id'],
@@ -53,6 +53,7 @@ for x in team_parse['teams']:
 ######################################################
 # BEGIN GETTING ROSTERS (Player Name, ID and Position)
 ######################################################
+
 player_array = []
 
 for a, b, c, d, e, f in team_array:
@@ -73,7 +74,8 @@ def get_sec(time_str):
 	m, s = time_str.split(':')
 	return int(m) * 60 + int(s)
 	
-def stats():	
+def stats():
+
 	##############################################
 	# BEGIN GETTING STATS (Baseline Season Stats )
 	##############################################
@@ -153,11 +155,7 @@ def stats():
 
 	df1['fanduelpoints']= (df1['goals']*12)+(df1['assists']*8)+(df1['powerPlayGoals']*0.5)+(df1['shortHandedGoals']*2)+(df1['shots']*1.60)+(df1['blocked']*1.6)
 
-	'''
-
 	#df2 = pd.DataFrame(goalie_stats_array)
-
-	'''
 
 	df1.to_gbq(
 		'hockey.players_season_summary',
@@ -292,6 +290,5 @@ def gamelogs():
 
 
 stats()
-
 gamelogs()
 

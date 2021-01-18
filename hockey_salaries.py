@@ -8,12 +8,11 @@ from google.cloud.exceptions import NotFound
 bigquery_key = '/Users/User/tanner-project-588591097cf3.json'
 
 def players ():
+	
 	website_url = requests.get("http://www.numberfire.com/nhl/daily-fantasy/daily-hockey-projections").text
 
 	soup = BeautifulSoup(website_url,"lxml")
 	#print(soup.prettify())
-
-
 
 	player_names = []
 
@@ -22,9 +21,6 @@ def players ():
 	table=soup.find("tbody")
 	table_names = table.find_all("a",{"class":"full"})
 	#print(table_names)
-
-
-
 	#print(table)
 
 	for tr in table_names:
@@ -41,7 +37,9 @@ def players ():
 
 
 
-	################player salaries###################
+	#######################
+	# BEGIN Player Salaries 
+	#######################
 
 	player_salaries = []
 
@@ -68,6 +66,7 @@ def players ():
 	df3['Salary'] = df3['Salary'].str.replace(r',','')
 	#df3['Salary'] = df3['Salary'].str.replace(r'N/A','0')
 	df3['Date'] = pd.Timestamp("today").strftime("%m/%d/%Y")
+	
 	#print(df3)
 
 
@@ -97,8 +96,6 @@ def goalies():
 	soup = BeautifulSoup(website_url,"lxml")
 	#print(soup.prettify())
 
-
-
 	table=soup.find("tbody")
 	table_names = table.find_all("a",{"class":"full"})
 	#print(table_names)
@@ -120,7 +117,9 @@ def goalies():
 
 
 
-	################player salaries###################
+	#######################
+	# BEGIN Goalie Salaries 
+	#######################
 
 	player_salaries = []
 
@@ -140,7 +139,9 @@ def goalies():
 	df2 = df2.replace(r'\t',' ', regex=True) 
 	df2 = df2.replace(r'\n',' ', regex=True)
 
-	#################player points#############################
+	#############################
+	# BEGIN Goalie FanDuel Points 
+	#############################
 
 	player_points = []
 
@@ -190,6 +191,7 @@ def goalies():
 		if_exists='append',
 		private_key = bigquery_key
 		)
+
 
 players()
 goalies()

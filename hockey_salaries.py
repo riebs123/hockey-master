@@ -3,9 +3,12 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
+from google.oauth2 import service_account
 
 
-bigquery_key = '/Users/User/tanner-project-588591097cf3.json'
+
+bigquery_key = service_account.Credentials.from_service_account_file('/Users/Tanner/Desktop/hockey-gbq.json')
+
 
 def players ():
 	
@@ -71,22 +74,20 @@ def players ():
 
 
 	df3.to_gbq(
-		'hockey.player_salaries',
+		'hockey_test.player_salaries',
 		'dulcet-outlook-227105',
 		chunksize=5000,
-		verbose=True,
 		reauth=False,
 		if_exists='replace',
-		private_key = bigquery_key
+		credentials = bigquery_key
 		)
 	df3.to_gbq(
-		'hockey.player_salaries_history',
+		'hockey_test.player_salaries_history',
 		'dulcet-outlook-227105',
 		chunksize=5000,
-		verbose=True,
 		reauth=False,
 		if_exists='append',
-		private_key = bigquery_key
+		credentials = bigquery_key
 		)
 
 def goalies():
@@ -174,22 +175,20 @@ def goalies():
 
 
 	df4.to_gbq(
-		'hockey.goalie_salaries',
+		'hockey_test.goalie_salaries',
 		'dulcet-outlook-227105',
 		chunksize=5000,
-		verbose=True,
 		reauth=False,
 		if_exists='replace',
-		private_key = bigquery_key
+		credentials = bigquery_key
 		)
 	df4.to_gbq(
-		'hockey.goalie_salaries_history',
+		'hockey_test.goalie_salaries_history',
 		'dulcet-outlook-227105',
 		chunksize=5000,
-		verbose=True,
 		reauth=False,
 		if_exists='append',
-		private_key = bigquery_key
+		credentials = bigquery_key
 		)
 
 

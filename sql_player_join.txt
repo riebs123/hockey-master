@@ -1,0 +1,180 @@
+SELECT
+  a.PlayerName,
+  CAST(d.Salary as int64) as salary,
+  SUM(e.gameScore) as gameScore,
+  SUM(e.highDangerGoals) as highDangerGoals,
+  SUM(e.highDangerShots) as highDangerShots,
+  SUM(e.expectedHighDangerGoals) as expectedHighDangerGoals,
+  SUM(a.goals) as goals,
+  SUM(a.assists) as assists,
+  SUM(a.points) as points,
+  SUM(a.shots) as shots,
+  SUM(a.games) as games,
+  SUM(a.timeOnIcePerGame) as timeOnIce,
+  SUM(a.powerPlayGoals) as powerPlayGoals,
+  SUM(a.powerPlayPoints) as powerPlayPoints,
+  SUM(a.fanduelpoints) as fanduelpoints,
+  SUM(b.goals) as fivegoals,
+  SUM(b.assists) as fiveassists,
+  SUM(b.points) as fivepoints,
+  SUM(b.shots) as fiveshots,
+  SUM(b.games) as fivegames,
+  SUM(b.timeOnIce) as fivetimeOnIce,
+  SUM(b.powerPlayGoals) as fivepowerPlayGoals,
+  SUM(b.powerPlayPoints) as fivepowerPlayPoints,
+  SUM(b.fanduelpoints) as fivefanduelpoints,
+  SUM(c.goals) as tengoals,
+  SUM(c.assists) as tenassists,
+  SUM(c.points) as tenpoints,
+  SUM(c.shots) as tenshots,
+  SUM(c.games) as tengames,
+  SUM(c.timeOnIce) as tentimeOnIce,
+  SUM(c.powerPlayGoals) as tenpowerPlayGoals,
+  SUM(c.powerPlayPoints) as tenpowerPlayPoints,
+  SUM(c.fanduelpoints) as tenfanduelpoints
+FROM
+(
+SELECT
+  TeamName,
+  TeamId,
+  DivisionName,
+  DivisionId,
+  ConferenceName,
+  ConferenceId,
+  PlayerName,
+  PlayerId,
+  Position,
+  ROUND((SUM(timeOnIce)/60)/SUM(games),2) AS timeOnIcePerGame,
+  SUM(assists) as assists,
+  SUM(goals) as goals,
+  SUM(pim) as pim,
+  SUM(shots) as shots,
+  SUM(hits) as hits,
+  SUM(games) as games,
+  SUM(powerPlayGoals) as powerPlayGoals,
+  SUM(powerPlayPoints) as powerPlayPoints,
+  ROUND(SUM((powerPlayTimeOnIce)/60),2) AS powerPlayTimeOnIce,
+  ROUND(SUM((evenTimeOnIce)/60),2) AS evenTimeOnIce,
+  SUM(gameWinningGoals) as gameWinningGoals,
+  SUM(overTimeGoals) as overTimeGoals,
+  SUM(shortHandedGoals) as shortHandedGoals,
+  SUM(shortHandedPoints) as shortHandedPoints,
+  ROUND(SUM((shortHandedTimeOnIce)/60),2) AS shortHandedTimeOnIce,
+  SUM(blocked) as blocked,
+  SUM(plusMinus) as plusMinus,
+  SUM(shifts) as shifts,
+  SUM(points) as points,
+  ROUND(SUM(fanduelpoints),2) as fanduelpoints
+FROM
+  `dulcet-outlook-227105.hockey_test.players_season_stats`
+GROUP BY
+    1,2,3,4,5,6,7,8,9
+    ) as a
+INNER JOIN
+(
+SELECT
+  TeamName,
+  TeamId,
+  DivisionName,
+  DivisionId,
+  ConferenceName,
+  ConferenceId,
+  PlayerName,
+  PlayerId,
+  Position,
+  ROUND((SUM(fivetimeOnIce)/60),2) AS timeOnIce,
+  SUM(fiveassists) as assists,
+  SUM(fivegoals) as goals,
+  SUM(fivepim) as pim,
+  SUM(fiveshots) as shots,
+  SUM(fivehits) as hits,
+  SUM(fivegames) as games,
+  SUM(fivepowerPlayGoals) as powerPlayGoals,
+  SUM(fivepowerPlayPoints) as powerPlayPoints,
+  ROUND(SUM((fivepowerPlayTimeOnIce)/60),2) AS powerPlayTimeOnIce,
+  ROUND(SUM((fiveevenTimeOnIce)/60),2) AS evenTimeOnIce,
+  SUM(fivegameWinningGoals) as gameWinningGoals,
+  SUM(fiveoverTimeGoals) as overTimeGoals,
+  SUM(fiveshortHandedGoals) as shortHandedGoals,
+  SUM(fiveshortHandedPoints) as shortHandedPoints,
+  ROUND(SUM((fiveshortHandedTimeOnIce)/60),2) AS shortHandedTimeOnIce,
+  SUM(fiveblocked) as blocked,
+  SUM(fiveplusMinus) as plusMinus,
+  SUM(fiveshifts) as shifts,
+  SUM(fivepoints) as points,
+  ROUND(SUM(fivefanduelpoints),2) as fanduelpoints
+FROM
+  `dulcet-outlook-227105.hockey_test.five_game_player_log`
+GROUP BY
+    1,2,3,4,5,6,7,8,9
+    ) as b
+ON
+b.PlayerName = a.PlayerName
+
+INNER JOIN
+(
+SELECT
+  TeamName,
+  TeamId,
+  DivisionName,
+  DivisionId,
+  ConferenceName,
+  ConferenceId,
+  PlayerName,
+  PlayerId,
+  Position,
+  ROUND((SUM(tentimeOnIce)/60),2) AS timeOnIce,
+  SUM(tenassists) as assists,
+  SUM(tengoals) as goals,
+  SUM(tenpim) as pim,
+  SUM(tenshots) as shots,
+  SUM(tenhits) as hits,
+  SUM(tengames) as games,
+  SUM(tenpowerPlayGoals) as powerPlayGoals,
+  SUM(tenpowerPlayPoints) as powerPlayPoints,
+  ROUND(SUM((tenpowerPlayTimeOnIce)/60),2) AS powerPlayTimeOnIce,
+  ROUND(SUM((tenevenTimeOnIce)/60),2) AS evenTimeOnIce,
+  SUM(tengameWinningGoals) as gameWinningGoals,
+  SUM(tenoverTimeGoals) as overTimeGoals,
+  SUM(tenshortHandedGoals) as shortHandedGoals,
+  SUM(tenshortHandedPoints) as shortHandedPoints,
+  ROUND(SUM((tenshortHandedTimeOnIce)/60),2) AS shortHandedTimeOnIce,
+  SUM(tenblocked) as blocked,
+  SUM(tenplusMinus) as plusMinus,
+  SUM(tenshifts) as shifts,
+  SUM(tenpoints) as points,
+  ROUND(SUM(tenfanduelpoints),2) as fanduelpoints
+FROM
+  `dulcet-outlook-227105.hockey_test.ten_game_player_log`
+GROUP BY
+    1,2,3,4,5,6,7,8,9
+    ) as c
+ON
+c.PlayerName = a.PlayerName
+
+
+INNER JOIN 
+  `dulcet-outlook-227105.hockey_test.player_salaries` as d
+ON
+a.PlayerName = d.PlayerName
+INNER JOIN 
+(
+SELECT 
+  name,
+  SUM(gameScore) as gameScore,
+  SUM(onIce_xGoalsPercentage) as xG,
+  SUM(I_F_highDangerShots) as highDangerShots,
+  SUM(I_F_highDangerGoals) as highDangerGoals,
+  SUM(I_F_highDangerxGoals) as expectedHighDangerGoals
+FROM
+  `dulcet-outlook-227105.hockey_test.players_season_stats_advanced`
+WHERE 
+  situation = 'all'
+GROUP BY
+  1
+  ) as e
+ON
+e.name = a.PlayerName
+
+GROUP BY
+1,2

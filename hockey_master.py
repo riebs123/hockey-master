@@ -3,14 +3,15 @@ import json
 import pandas as pd
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
+from google.oauth2 import service_account
 
-bigquery_key = '/Users/User/tanner-project-588591097cf3.json'
+bigquery_key = service_account.Credentials.from_service_account_file('/Users/Tanner/Desktop/hockey-gbq.json')
 
 #####################
 # GET TODAYS SCHEDULE
 #####################
 
-schedule_url = 'https://statsapi.web.nhl.com/api/v1/schedule?'
+schedule_url = 'https://statsapi.web.nhl.com/api/v1/schedule?date=2021-01-18'
 schedule_response = requests.get(schedule_url)
 schedule_parse = json.loads(schedule_response.text) 
 
@@ -158,13 +159,12 @@ def stats():
 	#df2 = pd.DataFrame(goalie_stats_array)
 
 	df1.to_gbq(
-		'hockey.players_season_summary',
+		'hockey_test.players_season_stats',
 		'dulcet-outlook-227105',
 		chunksize=5000,
-		verbose=True,
-		reauth=False,
 		if_exists='replace',
-		private_key = bigquery_key
+		reauth=False,
+		credentials = bigquery_key
 		)
 
 def gamelogs():
@@ -269,23 +269,21 @@ def gamelogs():
 
 
 	df1.to_gbq(
-		'hockey.ten_game_player_log_summary',
+		'hockey_test.ten_game_player_log',
 		'dulcet-outlook-227105',
 		chunksize=5000,
-		verbose=True,
 		reauth=False,
 		if_exists='replace',
-		private_key = bigquery_key
+		credentials = bigquery_key
 		)			
 
 	df2.to_gbq(
-		'hockey.five_game_player_log_summary',
+		'hockey_test.five_game_player_log',
 		'dulcet-outlook-227105',
 		chunksize=5000,
-		verbose=True,
 		reauth=False,
 		if_exists='replace',
-		private_key = bigquery_key
+		credentials = bigquery_key
 		)
 
 

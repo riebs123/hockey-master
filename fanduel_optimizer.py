@@ -8,10 +8,12 @@ import re
 from itertools import permutations
 from pulp import *
 from google.cloud import bigquery
+from google.cloud.exceptions import NotFound
+from google.oauth2 import service_account
 
-bigquery_key = '/Users/User/tanner-project-588591097cf3.json'
+bigquery_key = service_account.Credentials.from_service_account_file('/Users/Tanner/Desktop/hockey-gbq.json')
 
-client = bigquery.Client.from_service_account_json('/Users/User/tanner-project-588591097cf3.json')
+bqclient = bigquery.Client(credentials=bigquery_key, project='dulcet-outlook-227105',)
 
 job_config = bigquery.QueryJobConfig()
 job_config.use_legacy_sql = False
@@ -44,16 +46,15 @@ def optimizer():
 	sql = """
 	SELECT
 	  PlayerName,
-	  Salary,
+	  salary,
 	  CASE
 		WHEN Position = 'Center' THEN 'C'
 		WHEN Position = 'Defenseman' THEN 'D'
 		ELSE 'W'
 	  END AS Position,
-	  SUM((Playmaker*6.0456)+(HighCeiling*9.9748)+(Consistent*4.6950)+(fanduelpoints*.0797)) AS Value
+	  ROUND(SUM((gameScore*8.85)+(xG*6.41)),2) AS Value
 	FROM
-	  `dulcet-outlook-227105.hockey.a_JOINED_FINAL`
-	WHERE Salary NOT LIKE '%N/A%'
+	  `dulcet-outlook-227105.hockey_test.joined`
 	GROUP BY
 	  PlayerName,
 	  Salary,
@@ -61,20 +62,18 @@ def optimizer():
 	UNION ALL
 	SELECT
 	  PlayerName,
-	  Salary,
+	  CAST(Salary as int64) as salary,
 	  'G' AS Position,
 	  (CAST(Points as NUMERIC)*5)
 	FROM
-	`dulcet-outlook-227105.hockey.goalie_salaries`
-	WHERE Points NOT LIKE '%N/A%'
-	AND SALARY NOT LIKE '%N/A%'
+	`dulcet-outlook-227105.hockey_test.goalie_salaries`
 	"""
 
-	availables = client.query(sql, job_config=job_config).result().to_dataframe()
+	availables = bqclient.query(sql, job_config=job_config).result().to_dataframe()
 	availables = availables.replace('$','') 
 	availables = availables.replace(r'        N/A','0', regex=True) 
 	availables = availables.replace(r',','', regex=True) 
-	availables['Salary'] = pd.to_numeric(availables['Salary'])
+	availables['salary'] = pd.to_numeric(availables['salary'])
 	#print(availables.head())
 
 
@@ -82,20 +81,20 @@ def optimizer():
 	points = {}
 	for pos in availables.Position.unique():
 		available_pos = availables[availables.Position == pos]
-		salary = list(available_pos[["PlayerName","Salary"]].set_index("PlayerName").to_dict().values())[0]
+		salary = list(available_pos[["PlayerName","salary"]].set_index("PlayerName").to_dict().values())[0]
 		point = list(available_pos[["PlayerName","Value"]].set_index("PlayerName").to_dict().values())[0]
 		salaries[pos] = salary
 		points[pos] = point
 	#print(salaries["Center"])
 
 	pos_num_available = {
-		"C": 2,
-		"W": 4,
+		"C": 3,
+		"W": 3,
 		"D": 2,
 		"G": 1
 	}
 
-	SALARY_CAP = 55000
+	salary_CAP = 55000
 
 
 	_vars = {k: LpVariable.dict(k, v, cat="Binary") for k, v in points.items()}
@@ -113,7 +112,7 @@ def optimizer():
 		prob += lpSum([_vars[k][i] for i in v]) <= pos_num_available[k]
 		
 	prob += lpSum(rewards)
-	prob += lpSum(costs) <= SALARY_CAP
+	prob += lpSum(costs) <= salary_CAP
 
 
 	prob.solve()
@@ -125,12 +124,22 @@ def optimizer():
 					
 	df1 = pd.DataFrame(lineup_name)
 	df1.columns = ['PlayerName']
+	df1['Date'] = pd.Timestamp("today").strftime("%m/%d/%Y")
+
+	df1.to_gbq(
+		'hockey_test.optimal_lineup',
+		'dulcet-outlook-227105',
+		chunksize=5000,
+		if_exists='append',
+		reauth=False,
+		credentials = bigquery_key
+	)
 	
 ###############EMAIL####################
 
 	full_trace = traceback.format_exc()
 	fromaddr = "tannerriebel@hotmail.com"
-	toaddr = ['hurle157@d.umn.edu', 'tannerriebel@hotmail.com', 'judreinke@gmail.com','mitch@aimclear.com']
+	toaddr = ['tannerriebel@hotmail.com']
 
 	msg = MIMEMultipart()
 	msg['From'] = fromaddr

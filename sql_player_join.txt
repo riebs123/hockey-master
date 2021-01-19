@@ -1,10 +1,15 @@
 SELECT
   a.PlayerName,
+  a.Position,
   CAST(d.Salary as int64) as salary,
   SUM(e.gameScore) as gameScore,
+  SUM(e.xG) as xG,
   SUM(e.highDangerGoals) as highDangerGoals,
   SUM(e.highDangerShots) as highDangerShots,
   SUM(e.expectedHighDangerGoals) as expectedHighDangerGoals,
+  SUM(e.mediumDangerGoals) as mediumDangerGoals,
+  SUM(e.mediumDangerShots) as mediumDangerShots,
+  SUM(e.expectedHighDangerGoals) as expectedMediumDangerGoals,
   SUM(a.goals) as goals,
   SUM(a.assists) as assists,
   SUM(a.points) as points,
@@ -162,10 +167,14 @@ INNER JOIN
 SELECT 
   name,
   SUM(gameScore) as gameScore,
-  SUM(onIce_xGoalsPercentage) as xG,
+  SUM(I_F_xGoals) as xG,
+  SUM(onIce_xGoalsPercentage) as xG_pct,
   SUM(I_F_highDangerShots) as highDangerShots,
   SUM(I_F_highDangerGoals) as highDangerGoals,
-  SUM(I_F_highDangerxGoals) as expectedHighDangerGoals
+  SUM(I_F_highDangerxGoals) as expectedHighDangerGoals,
+  SUM(I_F_mediumDangerShots) as mediumDangerShots,
+  SUM(I_F_mediumDangerGoals) as mediumDangerGoals,
+  SUM(I_F_mediumDangerxGoals) as expectedMediumDangerGoals
 FROM
   `dulcet-outlook-227105.hockey_test.players_season_stats_advanced`
 WHERE 
@@ -177,4 +186,4 @@ ON
 e.name = a.PlayerName
 
 GROUP BY
-1,2
+1,2,3
